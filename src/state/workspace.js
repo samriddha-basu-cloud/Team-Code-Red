@@ -1,0 +1,58 @@
+// Editable planning data (people, TPM, spares, risks) saved in the browser.
+export const MODULES = [
+  { id: 'l1a', level: 'L1', label: 'HMI, start/stop, recipes, safety & lock-out' },
+  { id: 'l1b', level: 'L1', label: 'Blank loading, reject bin, 5S' },
+  { id: 'l2a', level: 'L2', label: 'Pneumatics & vacuum' },
+  { id: 'l2b', level: 'L2', label: 'Servo basics & change parts' },
+  { id: 'l2c', level: 'L2', label: 'Golden-sample vision checks' },
+  { id: 'l2d', level: 'L2', label: 'First-line fault-finding (MTTR ≤ 10 min)' },
+  { id: 'l3a', level: 'L3', label: 'PLC & motion diagnostics, root-cause' },
+  { id: 'l4a', level: 'L4', label: 'OEE analytics, kaizen, training others' },
+];
+
+export const DEFAULT_WS = {
+  transition: [
+    { path: 'Certified cell technicians', people: 6, when: 'Mar–Aug 2027' },
+    { path: 'Blank feeders (ergonomic station)', people: 4, when: 'From go-live' },
+    { path: 'Rework table & QA data associates', people: 2, when: 'From go-live' },
+    { path: 'Downstream packing & dispatch (+25% volume)', people: 7, when: 'As volume ramps' },
+    { path: 'Natural attrition, no backfill', people: 7, when: 'Dec 2026 – Aug 2027' },
+    { path: 'Other lines / sister plants', people: 5, when: 'Aug – Oct 2027' },
+  ],
+  cohort: Array.from({ length: 6 }, (_, i) => ({ name: `Trainee ${i + 1}`, done: {} })),
+  budget: [
+    { item: 'OEM training & travel during FAT', l: 3 },
+    { item: 'ITI modules & certification', l: 2.5 },
+    { item: 'Trainer time & stipends', l: 1.5 },
+    { item: 'Wrist-health screening & physiotherapy', l: 1 },
+    { item: 'Transition support fund', l: 2 },
+  ],
+  tpm: [
+    { id: 'cil', task: 'Clean-inspect-lubricate checklist, vacuum level, camera window, glue level', freqH: 8, who: 'Cell technician', mins: 15, lastDoneH: 0 },
+    { id: 'blades', task: 'Fold blades & clamp pads inspection, dust filters', freqH: 24, who: 'Cell technician', mins: 20, lastDoneH: 0 },
+    { id: 'golden', task: 'Belt & chain tension, vacuum cups, golden-sample vision check', freqH: 168, who: 'Technician + QA', mins: 60, lastDoneH: 0 },
+    { id: 'cams', task: 'Cam followers, bearings, hot-melt nozzles, safety interlock test', freqH: 720, who: 'Maintenance', mins: 120, lastDoneH: 0 },
+    { id: 'vib', task: 'Turret gearbox vibration analysis, thermal & checkweigher calibration', freqH: 2160, who: 'Maintenance + OEM', mins: 240, lastDoneH: 0 },
+    { id: 'overhaul', task: 'Cam track, bearings, chain overhaul; software backup; OEM audit', freqH: 8640, who: 'OEM + maintenance', mins: 960, lastDoneH: 0 },
+  ],
+  spares: [
+    { part: 'Fold blade set', qty: 2, min: 1, lead: 21, costL: 1.2 },
+    { part: 'Clamp pads (set of 12)', qty: 4, min: 2, lead: 14, costL: 0.3 },
+    { part: 'Vacuum cups (pack of 50)', qty: 3, min: 2, lead: 7, costL: 0.15 },
+    { part: 'Turret servo drive + motor', qty: 1, min: 1, lead: 45, costL: 3.5 },
+    { part: 'Line-scan camera', qty: 1, min: 1, lead: 60, costL: 4 },
+    { part: 'Pocket chain section', qty: 2, min: 1, lead: 30, costL: 0.6 },
+    { part: 'Hot-melt glue module', qty: 1, min: 1, lead: 21, costL: 0.8 },
+    { part: 'Sensor kit (photo-eyes, prox)', qty: 1, min: 1, lead: 10, costL: 0.4 },
+  ],
+  risks: [
+    { risk: 'Strips tear in the fold at GSM / humidity extremes', L: 2, I: 3, status: 'Mitigating', owner: 'Project engineer', mitigation: 'FAT: 5,000 strips at 90 & 100 GSM, 45% & 65% RH; accept ≤ 0.1% damage' },
+    { risk: 'Workforce anxiety or resistance', L: 3, I: 3, status: 'Mitigating', owner: 'HR & plant head', mitigation: 'Written no-forced-exit pledge, town hall, operators on FAT team' },
+    { risk: 'Filled sachets too thick for the stack', L: 2, I: 2, status: 'Open', owner: 'Packaging dev', mitigation: 'Measure 500 samples; carton +4 mm option costed' },
+    { risk: 'Warped or damp blanks jam the erector', L: 2, I: 2, status: 'Open', owner: 'Procurement & QA', mitigation: 'Flatness ±2 mm, moisture ≤ 10%, dry storage' },
+    { risk: 'Vendor delivery delay', L: 2, I: 2, status: 'Open', owner: 'Procurement', mitigation: '0.5%/week penalty capped 5%; weekly build reviews' },
+    { risk: 'Skills gap once vendor leaves', L: 2, I: 3, status: 'Mitigating', owner: 'Engineering head', mitigation: '6 trained technicians, 2-year OEM support, L3 path' },
+    { risk: 'Moisture ingress in the cell', L: 1, I: 3, status: 'Mitigating', owner: 'QA', mitigation: 'RH ≤ 40% enclosure with logging and alarm' },
+    { risk: 'Integration CapEx overrun', L: 1, I: 2, status: 'Open', owner: 'Finance', mitigation: 'Fixed-price turnkey; 10% central contingency' },
+  ],
+};
