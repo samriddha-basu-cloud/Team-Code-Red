@@ -3,14 +3,15 @@ import { Lock, Unlock, RotateCcw } from 'lucide-react';
 import { PARAM_MAP } from '../model/params.js';
 import { useParams } from '../state/ParamsContext.jsx';
 import { fmtClock } from '../util/format.js';
+import { Tip, InfoTip } from './Tip.jsx';
 
-export function Card({ title, sub, tag, right, children, className = '', style }) {
+export function Card({ title, sub, tag, right, children, className = '', style, tip }) {
   return (
     <div className={`card ${className}`} style={style}>
       {(title || right) && (
         <div className="card-h">
           <div>
-            {title && <h3>{tag && <span className="tag">{tag}</span>}{title}</h3>}
+            {title && <h3>{tag && <span className="tag">{tag}</span>}{title}{tip && <InfoTip text={tip} />}</h3>}
             {sub && <div className="sub" style={{ marginTop: 3 }}>{sub}</div>}
           </div>
           {right}
@@ -21,10 +22,10 @@ export function Card({ title, sub, tag, right, children, className = '', style }
   );
 }
 
-export function Kpi({ label, value, sub, dark, icon: Icon, tone, target, pct }) {
+export function Kpi({ label, value, sub, dark, icon: Icon, tone, target, pct, tip }) {
   return (
     <div className={`kpi ${dark ? 'dark' : ''}`}>
-      <div className="l">{Icon && <Icon size={14} />}{label}</div>
+      <div className="l">{Icon && <Icon size={14} />}{label}{tip && <span style={{ marginLeft: 'auto' }}><InfoTip text={tip} /></span>}</div>
       <div className={`v ${tone || ''}`}>{value}</div>
       {sub && <div className="s">{sub}</div>}
       {pct !== undefined && (
@@ -75,6 +76,20 @@ function NumInput({ value, onCommit, disabled, step, min, max }) {
   );
 }
 
+function ParamTipBody({ m, v }) {
+  return (
+    <div>
+      <div style={{ fontWeight: 700, marginBottom: 4 }}>{m.label}</div>
+      {m.note && <div style={{ marginBottom: 4 }}>{m.note}</div>}
+      <div style={{ opacity: 0.85 }}>
+        {m.kind === 'const' ? 'Constant: fixed by the case or physics. Unlock constants to change it.' : 'Variable: a decision or assumption you can tune.'}
+      </div>
+      <div style={{ marginTop: 6, fontVariantNumeric: 'tabular-nums' }}>Now <b>{String(v)}</b> {m.unit} · default {String(m.def)} · range {m.min}–{m.max}</div>
+      <div style={{ opacity: 0.7, marginTop: 2, fontFamily: 'monospace', fontSize: 11 }}>{m.key}</div>
+    </div>
+  );
+}
+
 export function ParamField({ k, compact = false }) {
   const { params, setParam, unlock } = useParams();
   const m = PARAM_MAP[k];
@@ -85,15 +100,15 @@ export function ParamField({ k, compact = false }) {
   if (m.type === 'bool') {
     return (
       <div className={`field ${changed ? 'changed' : ''}`}>
-        <div className="lbl">{m.label}{m.note && <small>{m.note}</small>}</div>
+        <div className="lbl"><Tip text={<ParamTipBody m={m} v={v} />} width={300}><span className="plabel">{m.label}</span></Tip>{m.note && <small>{m.note}</small>}</div>
         <div className="ctl"><Switch on={!!v} onChange={(x) => setParam(k, x)} disabled={locked} /></div>
       </div>
     );
   }
   return (
-    <div className={`field ${changed ? 'changed' : ''}`} title={m.note || ''}>
+    <div className={`field ${changed ? 'changed' : ''}`}>
       <div className="lbl">
-        {m.label}
+        <Tip text={<ParamTipBody m={m} v={v} />} width={300}><span className="plabel">{m.label}</span></Tip>
         {!compact && (
           <small>
             <span className={`lock ${m.kind === 'var' ? 'var' : ''}`}>{m.kind === 'const' ? 'CONST' : 'VAR'}</span>

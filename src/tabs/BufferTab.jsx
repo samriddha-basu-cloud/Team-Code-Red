@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ResponsiveContainer, ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ReferenceDot } from 'recharts';
 import { Play, Loader2, Layers, Timer, RefreshCw, Target } from 'lucide-react';
 import { Card, Kpi, PageHead, ParamField, tooltipStyle, C } from '../components/ui.jsx';
+import { GLOSSARY } from '../components/Tip.jsx';
 import { useParams } from '../state/ParamsContext.jsx';
 import { bufferCurve } from '../model/buffer.js';
 
@@ -47,9 +48,9 @@ export default function BufferTab() {
         right={<button className="btn primary" onClick={run} disabled={busy}>{busy ? <Loader2 size={15} className="spin" /> : <Play size={15} />}{busy ? 'Simulating…' : 'Run simulation'}</button>} />
       <div className="stack" style={{ gap: 14 }}>
         <div className="grid g6">
-          <Kpi dark label="Chosen buffer" icon={Layers} value={`${p.bufferCapacity} strips`} sub={cur ? `${cur.withHeadroom.toFixed(2)}% primary blocked` : 'run to evaluate'} />
-          <Kpi label="Absorbs a stop of" icon={Timer} value={`${absorb.toFixed(0)} s`} sub="at line demand" />
-          <Kpi label="Refill time" icon={RefreshCw} value={isFinite(refill) ? `${refill.toFixed(1)} min` : 'never'} sub={`cell ${d.cellMax.toFixed(0)} vs demand ${d.stripsPerMin.toFixed(0)} strips/min`} tone={isFinite(refill) ? '' : 'bad'} />
+          <Kpi dark label="Chosen buffer" tip={GLOSSARY.Blocking} icon={Layers} value={`${p.bufferCapacity} strips`} sub={cur ? `${cur.withHeadroom.toFixed(2)}% primary blocked` : 'run to evaluate'} />
+          <Kpi label="Absorbs a stop of" tip={'Buffer capacity ÷ demand rate: the longest cell stop that does not block the primary.'} icon={Timer} value={`${absorb.toFixed(0)} s`} sub="at line demand" />
+          <Kpi label="Refill time" tip={'Buffer capacity ÷ (cell maximum − line demand). How long the cell needs to empty a full buffer.'} icon={RefreshCw} value={isFinite(refill) ? `${refill.toFixed(1)} min` : 'never'} sub={`cell ${d.cellMax.toFixed(0)} vs demand ${d.stripsPerMin.toFixed(0)} strips/min`} tone={isFinite(refill) ? '' : 'bad'} />
           <Kpi label="Recommended (≤ target)" icon={Target} value={rec ? `${rec.buffer} strips` : 'none tested'} sub={`target ${target}% blocked`} />
           <Kpi label="Simulated cell downtime" value={res ? `${res.cellDown.toFixed(2)}%` : '—'} sub="micro + longer stops" />
           <Kpi label="Primary own downtime" value={res ? `${res.primDown.toFixed(2)}%` : '—'} sub="random stops" />

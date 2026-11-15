@@ -5,14 +5,19 @@ import { Card, Kpi, PageHead, Alarms, EventLog, tooltipStyle, C } from '../compo
 import TwinCanvas from '../components/TwinCanvas.jsx';
 import TwinControls from '../components/TwinControls.jsx';
 import { LiveKpis } from './TwinTab.jsx';
+import { GLOSSARY } from '../components/Tip.jsx';
 import { useParams } from '../state/ParamsContext.jsx';
 import { useTwinCtl, useTick } from '../state/TwinContext.jsx';
 import { PRESETS } from '../model/params.js';
 import { fmtCr, fmtMonths, fmtPct, fmtNum } from '../util/format.js';
+import { useDecision } from '../state/useDecision.js';
+import { VerdictBadge } from './DecisionTab.jsx';
+import { Gavel, BookOpen } from 'lucide-react';
 
 export default function Overview({ go }) {
   const { params: p, d, fin, oee, applyPreset, activePreset, blocking } = useParams();
   const { twin, mode } = useTwinCtl();
+  const { gate, ranking } = useDecision();
   useTick(2);
   const k = twin.kpis();
   const m = twin.m;
@@ -39,6 +44,24 @@ export default function Overview({ go }) {
         sub="Case: re-engineering secondary packaging at the mouth freshener division. Pick a stress scenario or open Controls to change any variable or constant."
         right={<div className="chips" style={{ maxWidth: 640, justifyContent: 'flex-end' }}>{Object.entries(PRESETS).map(([id, s]) => <button key={id} className={`btn sm ${activePreset === id ? 'on' : ''}`} onClick={() => applyPreset(id)}>{s.label}</button>)}</div>} />
       <div className="stack" style={{ gap: 14 }}>
+        <div className="verdict-banner" data-tour="verdict">
+          <div className="row" style={{ gap: 14, flexWrap: 'nowrap', minWidth: 0 }}>
+            <VerdictBadge verdict={gate.verdict} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 700 }}>
+                {gate.verdict === 'GO' ? 'All ten gates pass.' : gate.verdict === 'NO-GO' ? `${gate.mustFail.length} must-pass gate${gate.mustFail.length > 1 ? 's' : ''} failing` : `Must-pass gates met · ${gate.condOpen.length} condition${gate.condOpen.length > 1 ? 's' : ''} open`}
+                <span className="muted" style={{ fontWeight: 500 }}> · top option on your weights: {ranking[0].label}</span>
+              </div>
+              <div className="small muted" style={{ marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {(gate.mustFail.length ? gate.mustFail : gate.condOpen).map((x) => `${x.label}: ${x.detail}`).join(' · ') || 'NPV, payback, worst case, engineering, OEE, blocking, risk, twin evidence, people and skills all clear.'}
+              </div>
+            </div>
+          </div>
+          <div className="row" style={{ flexWrap: 'nowrap' }}>
+            <button className="btn dark" onClick={() => go('decision')}><Gavel size={15} />Decision Studio</button>
+            <button className="btn" onClick={() => go('guide')}><BookOpen size={15} />How to use</button>
+          </div>
+        </div>
         <LiveKpis />
         <div className="grid g3">
           <Card className="span2" title="Digital twin" tag="LIVE" right={<button className="btn sm" onClick={() => go('twin')}>Open full twin →</button>} style={{ padding: 12 }}>
@@ -51,12 +74,12 @@ export default function Overview({ go }) {
           </div>
         </div>
         <div className="grid g6">
-          <Kpi dark label="NPV @ discount rate" icon={IndianRupee} value={fmtCr(fin.npv)} sub={`${p.years}-yr, ${p.discountRate}% · post-tax ${fmtCr(fin.postNpv)}`} />
-          <Kpi label="IRR" icon={Percent} value={fin.irr == null ? 'n/a' : fmtPct(fin.irr * 100, 0)} sub={`post-tax ${fin.postIrr == null ? 'n/a' : fmtPct(fin.postIrr * 100, 0)}`} />
-          <Kpi label="Payback" icon={Hourglass} value={fmtMonths(fin.pb)} sub={`discounted ${fmtMonths(fin.dpb)}`} />
-          <Kpi label="Net saving (steady year)" icon={PiggyBank} value={fmtCr(fin.steady.net)} sub={`COPQ ${fmtCr(fin.steady.copq)} · labour ${fmtCr(fin.steady.labour)}`} />
+          <Kpi dark label="NPV @ discount rate" tip={GLOSSARY.NPV} icon={IndianRupee} value={fmtCr(fin.npv)} sub={`${p.years}-yr, ${p.discountRate}% · post-tax ${fmtCr(fin.postNpv)}`} />
+          <Kpi label="IRR" tip={GLOSSARY.IRR} icon={Percent} value={fin.irr == null ? 'n/a' : fmtPct(fin.irr * 100, 0)} sub={`post-tax ${fin.postIrr == null ? 'n/a' : fmtPct(fin.postIrr * 100, 0)}`} />
+          <Kpi label="Payback" tip={GLOSSARY.Payback} icon={Hourglass} value={fmtMonths(fin.pb)} sub={`discounted ${fmtMonths(fin.dpb)}`} />
+          <Kpi label="Net saving (steady year)" tip={'Year-2 savings (COPQ + labour) minus new running costs.'} icon={PiggyBank} value={fmtCr(fin.steady.net)} sub={`COPQ ${fmtCr(fin.steady.copq)} · labour ${fmtCr(fin.steady.labour)}`} />
           <Kpi label="Total investment" icon={Landmark} value={fmtCr(fin.inv)} sub={`CapEx ${fmtCr(fin.capex)} + people ${fmtCr(fin.training)}`} />
-          <Kpi label="People on rolls today" icon={Users} value={fmtNum(d.rollCount, 0)} sub={`${p.opsPerShift}/shift × ${p.shifts}, ${p.absenteeism}% absenteeism`} />
+          <Kpi label="People on rolls today" tip={'Active operators per shift × shifts × 7/6 for weekly offs ÷ (1 − absenteeism).'} icon={Users} value={fmtNum(d.rollCount, 0)} sub={`${p.opsPerShift}/shift × ${p.shifts}, ${p.absenteeism}% absenteeism`} />
         </div>
         <div className="grid g3">
           <Card title="OEE: today vs cell model vs live twin" sub={`Residual blocking from buffer model ${blocking.blockedPct.toFixed(2)}%`}>

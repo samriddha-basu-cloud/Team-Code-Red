@@ -5,6 +5,7 @@ import { Card, Kpi, PageHead, Alarms, EventLog, tooltipStyle, C } from '../compo
 import TwinCanvas from '../components/TwinCanvas.jsx';
 import TwinControls from '../components/TwinControls.jsx';
 import { useTwinCtl, useTick } from '../state/TwinContext.jsx';
+import { GLOSSARY } from '../components/Tip.jsx';
 import { useParams } from '../state/ParamsContext.jsx';
 import { fmtNum, fmtPct, fmtDur } from '../util/format.js';
 
@@ -18,12 +19,12 @@ export function LiveKpis() {
   const m = twin.m;
   return (
     <div className="grid g6">
-      <Kpi dark label="Live OEE" icon={Activity} value={fmtPct(k.OEE * 100)} sub={`target ${p.oeeTarget}%`} pct={k.OEE * 100} target={p.oeeTarget} />
-      <Kpi label="A · P · Q" icon={Gauge} value={`${(k.A * 100).toFixed(1)} · ${(k.P * 100).toFixed(1)} · ${(k.Q * 100).toFixed(1)}`} sub="% since reset" />
-      <Kpi label="Throughput" icon={Boxes} value={`${k.cpm.toFixed(1)}`} sub={`cartons/min · ${fmtNum(m.cartonsGood)} good`} tone={k.cpm >= 0.95 * (p.primarySpeed / p.sachetsPerStrip / p.stripsPerCarton) * (p.perfCell / 100) ? 'good' : ''} />
-      <Kpi label="Buffer level" icon={Layers} value={fmtPct(k.bufferPct, 0)} sub={`${twin.buffer} strips`} pct={k.bufferPct} target={p.bandSoft} tone={k.bufferPct >= p.bandSoft ? 'bad' : k.bufferPct >= p.bandMid ? 'warn' : ''} />
-      <Kpi label="Primary blocked" icon={Ban} value={fmtPct(k.blockedPct, 2)} sub={`${m.blockedEvents} events · soft-slow ${fmtDur(m.tSoft)}`} tone={k.blockedPct > 1 ? 'bad' : 'good'} />
-      <Kpi label="Cell availability · MTTR" icon={Wrench} value={`${(k.cellAvail * 100).toFixed(1)}%`} sub={`${m.cellStops} stops · MTTR ${k.mttr.toFixed(1)} min`} tone={k.cellAvail * 100 >= p.availTarget ? 'good' : 'warn'} />
+      <Kpi dark label="Live OEE" tip={GLOSSARY.OEE} icon={Activity} value={fmtPct(k.OEE * 100)} sub={`target ${p.oeeTarget}%`} pct={k.OEE * 100} target={p.oeeTarget} />
+      <Kpi label="A · P · Q" tip={`A: ${GLOSSARY.Availability} P: ${GLOSSARY.Performance} Q: ${GLOSSARY.Quality}`} icon={Gauge} value={`${(k.A * 100).toFixed(1)} · ${(k.P * 100).toFixed(1)} · ${(k.Q * 100).toFixed(1)}`} sub="% since reset" />
+      <Kpi label="Throughput" tip={'Good cartons per minute over the last 60 simulated seconds. Demand at full speed is 50 cartons/min × inherent performance.'} icon={Boxes} value={`${k.cpm.toFixed(1)}`} sub={`cartons/min · ${fmtNum(m.cartonsGood)} good`} tone={k.cpm >= 0.95 * (p.primarySpeed / p.sachetsPerStrip / p.stripsPerCarton) * (p.perfCell / 100) ? 'good' : ''} />
+      <Kpi label="Buffer level" tip={GLOSSARY.Buffer} icon={Layers} value={fmtPct(k.bufferPct, 0)} sub={`${twin.buffer} strips`} pct={k.bufferPct} target={p.bandSoft} tone={k.bufferPct >= p.bandSoft ? 'bad' : k.bufferPct >= p.bandMid ? 'warn' : ''} />
+      <Kpi label="Primary blocked" tip={GLOSSARY.Blocking} icon={Ban} value={fmtPct(k.blockedPct, 2)} sub={`${m.blockedEvents} events · soft-slow ${fmtDur(m.tSoft)}`} tone={k.blockedPct > 1 ? 'bad' : 'good'} />
+      <Kpi label="Cell availability · MTTR" tip={`Share of time the cell is not stopped. ${GLOSSARY.MTTR}`} icon={Wrench} value={`${(k.cellAvail * 100).toFixed(1)}%`} sub={`${m.cellStops} stops · MTTR ${k.mttr.toFixed(1)} min`} tone={k.cellAvail * 100 >= p.availTarget ? 'good' : 'warn'} />
     </div>
   );
 }

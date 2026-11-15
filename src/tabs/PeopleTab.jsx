@@ -2,6 +2,7 @@ import React from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { Users, GraduationCap, Wallet, Wrench, PackageSearch, HeartHandshake, Plus, Trash2, Check, RotateCcw } from 'lucide-react';
 import { Card, Kpi, PageHead, tooltipStyle, C } from '../components/ui.jsx';
+import { GLOSSARY } from '../components/Tip.jsx';
 import { useParams } from '../state/ParamsContext.jsx';
 import { useTwinCtl, useTick } from '../state/TwinContext.jsx';
 import { MODULES } from '../state/workspace.js';
@@ -43,11 +44,11 @@ export default function PeopleTab() {
         sub="Automation with compassion: a written no-forced-exit pledge. Plan where each person goes, track the technician cohort, and run the TPM rhythm against the twin's running hours." />
       <div className="stack" style={{ gap: 14 }}>
         <div className="grid g6">
-          <Kpi dark label="People on rolls" icon={Users} value={Math.round(d.rollCount)} sub={`${p.opsPerShift}/shift × ${p.shifts} · ${p.absenteeism}% absent`} />
+          <Kpi dark label="People on rolls" tip={'Active operators per shift × shifts × 7/6 for weekly offs ÷ (1 − absenteeism).'} icon={Users} value={Math.round(d.rollCount)} sub={`${p.opsPerShift}/shift × ${p.shifts} · ${p.absenteeism}% absent`} />
           <Kpi label="Transition plan" icon={HeartHandshake} value={`${total} placed`} sub={gap === 0 ? 'everyone has a path' : gap > 0 ? `${gap} still without a path` : `${-gap} more paths than people`} tone={gap === 0 ? 'good' : 'warn'} />
           <Kpi label="Technicians at L2" icon={GraduationCap} value={`${l2done} / ${ws.cohort.length}`} sub={`need ${p.techs} on roster`} tone={l2done >= p.techs ? 'good' : 'warn'} />
           <Kpi label="People programme" icon={Wallet} value={`₹${budget.toFixed(1)} L`} sub={`model uses ₹${p.trainingL} L`} tone={Math.abs(budget - p.trainingL) < 0.05 ? 'good' : 'warn'} />
-          <Kpi label="TPM status" icon={Wrench} value={overdue ? `${overdue} overdue` : 'On track'} sub={`${pmHours.toFixed(0)} planned h/yr · twin at ${nowH.toFixed(1)} h`} tone={overdue ? 'bad' : 'good'} />
+          <Kpi label="TPM status" tip={'Due dates run on the twin clock. Fast-forward the twin to see tasks fall due.'} icon={Wrench} value={overdue ? `${overdue} overdue` : 'On track'} sub={`${pmHours.toFixed(0)} planned h/yr · twin at ${nowH.toFixed(1)} h`} tone={overdue ? 'bad' : 'good'} />
           <Kpi label="Critical spares" icon={PackageSearch} value={low ? `${low} below min` : 'Stocked'} sub={`inventory ₹${stockVal.toFixed(1)} L`} tone={low ? 'bad' : 'good'} />
         </div>
         <div className="grid g3">

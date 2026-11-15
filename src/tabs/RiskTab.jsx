@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, Cell, LabelList } from 'recharts';
 import { Dice5, Plus, Trash2, Scale, ShieldAlert } from 'lucide-react';
 import { Card, Kpi, PageHead, ParamField, tooltipStyle, C } from '../components/ui.jsx';
+import { GLOSSARY } from '../components/Tip.jsx';
 import { useParams } from '../state/ParamsContext.jsx';
 import { PRESETS } from '../model/params.js';
 import { scenarioTable, tornado, breakEvenCopqRealisation, monteCarloNpv, finance } from '../model/engine.js';
@@ -23,7 +24,7 @@ export default function RiskTab() {
   const be = useMemo(() => breakEvenCopqRealisation(p), [p]);
   const torData = tor.rows.map((r) => ({ label: r.label, range: [Math.min(r.lo, r.hi) / 1e7, Math.max(r.lo, r.hi) / 1e7], lo: r.lo / 1e7, hi: r.hi / 1e7 }));
   const scenData = scen.map((s) => ({ ...s, npvCr: s.npv / 1e7 }));
-  const runMc = () => setMc(monteCarloNpv(base, n, 42, spread));
+  const runMc = () => { const r = monteCarloNpv(base, n, 42, spread); setMc(r); setWs('lastMc', { pLoss: r.pLoss, p10: r.p10, p50: r.p50, p90: r.p90, at: Date.now() }); };
 
   const risks = ws.risks;
   const upd = (i, k, v) => setWs('risks', (rs) => rs.map((r, j) => (j === i ? { ...r, [k]: v } : r)));
@@ -35,9 +36,9 @@ export default function RiskTab() {
       <div className="stack" style={{ gap: 14 }}>
         <div className="grid g4">
           <Kpi dark label="Current setting NPV" icon={Scale} value={fmtCr(current.npv)} sub={activePreset ? PRESETS[activePreset].label : 'Custom scenario'} />
-          <Kpi label="Break-even COPQ gain" value={`${(be * 100).toFixed(1)}%`} sub={`of planned: COPQ ${p.copqBefore}% → ${(p.copqBefore - be * (p.copqBefore - p.copqAfter)).toFixed(2)}%`} />
-          <Kpi label="Worst preset NPV" icon={ShieldAlert} value={fmtCr(Math.min(...scen.map((s) => s.npv)))} sub={`payback ${fmtMonths(scen.reduce((a, b) => (b.npv < a.npv ? b : a)).pb)}`} tone={Math.min(...scen.map((s) => s.npv)) > 0 ? 'good' : 'bad'} />
-          <Kpi label="Monte Carlo P(NPV < 0)" icon={Dice5} value={mc ? fmtPct(mc.pLoss * 100, 1) : '—'} sub={mc ? `P10 ₹${mc.p10.toFixed(2)} · P50 ₹${mc.p50.toFixed(2)} · P90 ₹${mc.p90.toFixed(2)} Cr` : 'run below'} />
+          <Kpi label="Break-even COPQ gain" tip={'Share of the planned COPQ reduction needed for NPV to reach zero. Low means the case has lots of margin.'} value={`${(be * 100).toFixed(1)}%`} sub={`of planned: COPQ ${p.copqBefore}% → ${(p.copqBefore - be * (p.copqBefore - p.copqAfter)).toFixed(2)}%`} />
+          <Kpi label="Worst preset NPV" tip={'Lowest NPV across the seven stress presets.'} icon={ShieldAlert} value={fmtCr(Math.min(...scen.map((s) => s.npv)))} sub={`payback ${fmtMonths(scen.reduce((a, b) => (b.npv < a.npv ? b : a)).pb)}`} tone={Math.min(...scen.map((s) => s.npv)) > 0 ? 'good' : 'bad'} />
+          <Kpi label="Monte Carlo P(NPV < 0)" tip={'Share of random futures with NPV below zero. Run the Monte Carlo below.'} icon={Dice5} value={mc ? fmtPct(mc.pLoss * 100, 1) : '—'} sub={mc ? `P10 ₹${mc.p10.toFixed(2)} · P50 ₹${mc.p50.toFixed(2)} · P90 ₹${mc.p90.toFixed(2)} Cr` : 'run below'} />
         </div>
         <div className="grid g3">
           <Card className="span2" title="Scenario stress tests" tag="M4" sub="A: speed −15% · B: CapEx +25% · C: +5% downtime, and combinations">

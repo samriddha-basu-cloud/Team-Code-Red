@@ -2,6 +2,7 @@ import React from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, Cell, LabelList } from 'recharts';
 import { Timer, Boxes, Gauge, TrendingUp, Ruler, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Card, Kpi, PageHead, ParamField, tooltipStyle, C } from '../components/ui.jsx';
+import { GLOSSARY } from '../components/Tip.jsx';
 import { useParams } from '../state/ParamsContext.jsx';
 import { oeeBridge } from '../model/engine.js';
 
@@ -77,10 +78,10 @@ export default function LineTab() {
         <div className="grid g6">
           <Kpi dark label="Line speed" icon={TrendingUp} value={`${d.lineSpeed.toFixed(0)}`} sub="sachets/min running" />
           <Kpi label="Strips · cartons" icon={Boxes} value={`${d.stripsPerMin.toFixed(1)} · ${d.cartonsPerMin.toFixed(1)}`} sub="per minute demand" />
-          <Kpi label="Takt" icon={Timer} value={`${d.taktCarton.toFixed(2)} s`} sub={`per carton · ${d.taktStrip.toFixed(2)} s per strip`} />
-          <Kpi label="Cell max rate" icon={Gauge} value={`${d.cellMax.toFixed(0)}`} sub={`strips/min · bottleneck ${d.bottleneck.id}`} />
-          <Kpi label="Headroom" icon={TrendingUp} value={`${d.headroom.toFixed(1)}%`} sub="catch-up speed after stops" tone={d.headroom >= 10 ? 'good' : 'bad'} />
-          <Kpi label="Manual: people needed" icon={Ruler} value={d.peopleNeeded.toFixed(1)} sub={`vs ${p.opsPerShift} deployed (${p.manualCycle}s/carton)`} tone={d.peopleNeeded > p.opsPerShift ? 'bad' : 'warn'} />
+          <Kpi label="Takt" tip={GLOSSARY.Takt} icon={Timer} value={`${d.taktCarton.toFixed(2)} s`} sub={`per carton · ${d.taktStrip.toFixed(2)} s per strip`} />
+          <Kpi label="Cell max rate" tip={'The slowest station sets the cell maximum (the bottleneck), in strips per minute.'} icon={Gauge} value={`${d.cellMax.toFixed(0)}`} sub={`strips/min · bottleneck ${d.bottleneck.id}`} />
+          <Kpi label="Headroom" tip={GLOSSARY.Headroom} icon={TrendingUp} value={`${d.headroom.toFixed(1)}%`} sub="catch-up speed after stops" tone={d.headroom >= 10 ? 'good' : 'bad'} />
+          <Kpi label="Manual: people needed" tip={'Manual cycle time ÷ carton takt at full speed: how many operators the old way needs with zero breaks.'} icon={Ruler} value={d.peopleNeeded.toFixed(1)} sub={`vs ${p.opsPerShift} deployed (${p.manualCycle}s/carton)`} tone={d.peopleNeeded > p.opsPerShift ? 'bad' : 'warn'} />
         </div>
         <div className="grid g3">
           <Card className="span2" title="Kinematics" tag="M1" sub="Nominal at demand, rated at the cell's maximum rate">

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, Cell, BarChart, LabelList, PieChart, Pie } from 'recharts';
 import { IndianRupee, Percent, Hourglass, TrendingUp, Landmark, PiggyBank, Download, FlaskConical } from 'lucide-react';
 import { Card, Kpi, PageHead, ParamField, tooltipStyle, C } from '../components/ui.jsx';
+import { GLOSSARY } from '../components/Tip.jsx';
 import { useParams } from '../state/ParamsContext.jsx';
 import { useTwinCtl } from '../state/TwinContext.jsx';
 import { alternatives, capexOf, CAPEX_CELL_KEYS, CAPEX_INTEG_KEYS } from '../model/engine.js';
@@ -55,12 +56,12 @@ export default function FinanceTab() {
           <button className="btn" disabled={!canApply} title={canApply ? '' : 'Run the twin in automated mode for at least 1 simulated day'} onClick={() => setParam('copqAfter', +tk.copq.toFixed(2))}><FlaskConical size={15} />Use twin COPQ ({tk.copq.toFixed(2)}%)</button></div>} />
       <div className="stack" style={{ gap: 14 }}>
         <div className="grid g6">
-          <Kpi dark label="NPV" icon={IndianRupee} value={fmtCr(fin.npv)} sub={`@ ${p.discountRate}%, ${p.years} years`} />
-          <Kpi label="IRR" icon={Percent} value={fin.irr == null ? 'n/a' : fmtPct(fin.irr * 100, 0)} sub="pre-tax" />
-          <Kpi label="Payback" icon={Hourglass} value={fmtMonths(fin.pb)} sub={`discounted ${fmtMonths(fin.dpb)}`} />
-          <Kpi label="ROI" icon={TrendingUp} value={fmtPct(fin.roiAnnual * 100, 0)} sub={`annual · ${fmtPct(fin.roi7 * 100, 0)} over ${p.years} yrs`} />
-          <Kpi label="Post-tax" icon={Landmark} value={fmtCr(fin.postNpv)} sub={`IRR ${fin.postIrr == null ? 'n/a' : fmtPct(fin.postIrr * 100, 0)} · payback ${fmtMonths(fin.postPb)}`} />
-          <Kpi label="Value from quality" icon={PiggyBank} value={fmtPct(qualityShare, 0)} sub="share of gross savings from COPQ" />
+          <Kpi dark label="NPV" tip={GLOSSARY.NPV} icon={IndianRupee} value={fmtCr(fin.npv)} sub={`@ ${p.discountRate}%, ${p.years} years`} />
+          <Kpi label="IRR" tip={GLOSSARY.IRR} icon={Percent} value={fin.irr == null ? 'n/a' : fmtPct(fin.irr * 100, 0)} sub="pre-tax" />
+          <Kpi label="Payback" tip={GLOSSARY.Payback} icon={Hourglass} value={fmtMonths(fin.pb)} sub={`discounted ${fmtMonths(fin.dpb)}`} />
+          <Kpi label="ROI" tip={'Annual ROI = steady-year net saving ÷ investment. Cumulative ROI = (sum of cash flows − investment) ÷ investment.'} icon={TrendingUp} value={fmtPct(fin.roiAnnual * 100, 0)} sub={`annual · ${fmtPct(fin.roi7 * 100, 0)} over ${p.years} yrs`} />
+          <Kpi label="Post-tax" tip={'NPV after corporate tax, with tax depreciation on a written-down-value basis.'} icon={Landmark} value={fmtCr(fin.postNpv)} sub={`IRR ${fin.postIrr == null ? 'n/a' : fmtPct(fin.postIrr * 100, 0)} · payback ${fmtMonths(fin.postPb)}`} />
+          <Kpi label="Value from quality" tip={GLOSSARY.COPQ} icon={PiggyBank} value={fmtPct(qualityShare, 0)} sub="share of gross savings from COPQ" />
         </div>
         <div className="grid g3">
           <Card className="span2" title="Cash flow" sub="Net cash per year (bars) and cumulative position (line), ₹ Cr">

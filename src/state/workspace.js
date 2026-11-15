@@ -11,6 +11,14 @@ export const MODULES = [
 ];
 
 export const DEFAULT_WS = {
+  weights: {},
+  scores: {},
+  gates: {},
+  decisionLog: [],
+  baseline: null,
+  lastMc: null,
+  coach: { caseId: null, step: 0, startLog: 0 },
+  visited: {},
   transition: [
     { path: 'Certified cell technicians', people: 6, when: 'Mar–Aug 2027' },
     { path: 'Blank feeders (ergonomic station)', people: 4, when: 'From go-live' },
